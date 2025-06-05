@@ -9,13 +9,13 @@ import io
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Fetch hourly temperature and plot with matplotlib"
+        description="Fetch hourly temperature and plot (SVG) with matplotlib"
     )
     parser.add_argument('--lat', type=float, required=True, help="Latitude")
     parser.add_argument('--lon', type=float, required=True, help="Longitude")
     args = parser.parse_args()
 
-    # 1) Fetch hourly temperature data
+    # 1) Fetch hourly temperature data:
     url = (
         f"https://api.open-meteo.com/v1/forecast"
         f"?latitude={args.lat}&longitude={args.lon}"
@@ -25,10 +25,10 @@ def main():
     resp.raise_for_status()
     data = resp.json()
 
-    times = data["hourly"]["time"]                 # ["2025-06-05T00:00", "2025-06-05T01:00", …]
+    times = data["hourly"]["time"]                 # ["2025-06-05T00:00", …]
     temps = data["hourly"]["temperature_2m"]       # [18.3, 17.9, …]
 
-    # 2) Convert ISO strings → datetime objects
+    # 2) Convert to datetime objects
     times_dt = [datetime.fromisoformat(t) for t in times]
 
     # 3) Plot
@@ -38,17 +38,19 @@ def main():
     plt.xlabel("Time (UTC)")
     plt.ylabel("Temperature (°C)")
 
-    # 4) Space out x-axis labels: one tick every 6 hours
+    # 4) Use AutoDateLocator + ConciseDateFormatter to avoid overlaps
     ax = plt.gca()
-    ax.xaxis.set_major_locator(mdates.HourLocator(interval=6))
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d\n%H:%M'))
+    locator = mdates.AutoDateLocator(minticks=4, maxticks=8)
+    formatter = mdates.ConciseDateFormatter(locator)
+    ax.xaxis.set_major_locator(locator)
+    ax.xaxis.set_major_formatter(formatter)
 
-    plt.xticks(rotation=45)
+    plt.xticks(rotation=45, ha="right")
     plt.tight_layout()
 
-    # 5) Emit PNG to stdout
+    # 5) Save as SVG instead of PNG (write raw SVG bytes to stdout)
     buf = io.BytesIO()
-    plt.savefig(buf, format='png')
+    plt.savefig(buf, format='svg')
     buf.seek(0)
     sys.stdout.buffer.write(buf.read())
 

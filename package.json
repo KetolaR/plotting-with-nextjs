@@ -8,7 +8,9 @@
   },
   "dependencies": {
     "next": "latest",
+    "plotly.js": "^3.0.1",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "react-plotly.js": "^2.6.0"
   }
 }

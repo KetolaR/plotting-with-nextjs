@@ -4,38 +4,28 @@ import path from "path";
 
 export default function handler(req, res) {
   const { lat, lon } = req.query;
-
   if (!lat || !lon) {
-    res.status(400).json({ error: "Missing 'lat' or 'lon' query parameter" });
-    return;
+    return res.status(400).json({ error: "Missing 'lat' or 'lon'" });
   }
 
-  // On Windows use "python", on macOS/Linux use "python3"
+  // On Windows use `python`, on macOS/Linux use `python3`
   const pythonCmd = process.platform === "win32" ? "python" : "python3";
-  
-  // Resolve the path to the Python script
   const scriptPath = path.join(process.cwd(), "python", "generate_chart.py");
 
-  // Spawn Python: pass lat & lon
-  const pythonProcess = spawn(pythonCmd, [scriptPath, "--lat", lat, "--lon", lon]);
+  // Spawn the Python process (which now writes SVG to stdout)
+  const py = spawn(pythonCmd, [scriptPath, "--lat", lat, "--lon", lon]);
 
   let chunks = [];
-  pythonProcess.stdout.on("data", (chunk) => {
-    chunks.push(chunk);
-  });
+  py.stdout.on("data", (c) => chunks.push(c));
+  py.stderr.on("data", (err) => console.error("Python stderr:", err.toString()));
 
-  pythonProcess.stderr.on("data", (errChunk) => {
-    console.error("Python stderr:", errChunk.toString());
-  });
-
-  pythonProcess.on("close", (code) => {
+  py.on("close", (code) => {
     if (code !== 0) {
-      res.status(500).json({ error: "Chart generation failed (exit code " + code + ")" });
-      return;
+      return res.status(500).json({ error: `Chart generation failed (exit ${code})` });
     }
-
-    const buffer = Buffer.concat(chunks);
-    res.setHeader("Content-Type", "image/png");
-    res.send(buffer);
+    const svgBuffer = Buffer.concat(chunks);
+    // Tell the browser this is an SVG
+    res.setHeader("Content-Type", "image/svg+xml");
+    res.send(svgBuffer);
   });
 }
