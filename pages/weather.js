@@ -76,12 +76,21 @@ export default function WeatherPage() {
       {weather && (
         <div>
           <h2>Hourly Temperature Chart</h2>
-          <img
-            src={`/api/chart?lat=${lat}&lon=${lon}`}
-            alt="Hourly Temperature Plot"
-            style={{ maxWidth: "100%" }}
+          <object
+            type="image/svg+xml"
+            data={`/api/chart?lat=${lat}&lon=${lon}`}
+            style={{ width: "100%", height: "400px" }}
+            aria-label="Hourly temperature chart"
           />
         </div>
+        // <div>
+        //   <h2>Hourly Temperature Chart</h2>
+        //   <img
+        //     src={`/api/chart?lat=${lat}&lon=${lon}`}
+        //     alt="Hourly Temperature Plot"
+        //     style={{ maxWidth: "100%" }}
+        //   />
+        // </div>
       )}
     </div>
   );
