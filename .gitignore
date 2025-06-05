@@ -1,0 +1,4 @@
+node_modules/
+.next/
+.env.local
+python/__pycache__/

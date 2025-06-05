@@ -33,27 +33,6 @@ export default function Home() {
             Weather without Python
             </Link>
         </div>
-      {/* <Link
-        href="/weather"
-        style={{
-            fontSize: "1.25rem",
-            color: "#0070f3",
-            textDecoration: "underline"
-        }}
-      >
-        Real-Time Weather Visualization with Python
-      </Link>
-
-      <Link
-        href="/weather2"
-        style={{
-            fontSize: "1.25rem",
-            color: "#0070f3",
-            textDecoration: "underline"
-        }}
-      >
-        Weather without Python
-      </Link> */}
     </div>
   );
 }
