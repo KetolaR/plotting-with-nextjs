@@ -1,7 +1,7 @@
-// pages/index.js
+// pages/weather.js
 import { useState } from "react";
 
-export default function Home() {
+export default function WeatherPage() {
   const [lat, setLat] = useState("");
   const [lon, setLon] = useState("");
   const [weather, setWeather] = useState(null);
@@ -13,13 +13,9 @@ export default function Home() {
       setError("Please enter both latitude and longitude.");
       return;
     }
-
     try {
-      // 1) Get current weather JSON
       const resp = await fetch(`/api/weather?lat=${lat}&lon=${lon}`);
-      if (!resp.ok) {
-        throw new Error("Failed to fetch current weather");
-      }
+      if (!resp.ok) throw new Error("Failed to fetch current weather");
       const data = await resp.json();
       setWeather(data);
     } catch (err) {
@@ -31,8 +27,9 @@ export default function Home() {
 
   return (
     <div style={{ maxWidth: "600px", margin: "2rem auto", fontFamily: "sans-serif" }}>
-      <h1>Real‐Time Weather Visualization</h1>
+      <h1>Real-Time Weather Visualization</h1>
 
+      {/* Input fields */}
       <div style={{ marginBottom: "1rem" }}>
         <label>
           Latitude:&nbsp;
@@ -59,22 +56,23 @@ export default function Home() {
         <button onClick={handleFetch}>Get Weather</button>
       </div>
 
+      {/* Error */}
       {error && (
         <div style={{ color: "red", marginBottom: "1rem" }}>
           {error}
         </div>
       )}
 
+      {/* Current weather display */}
       {weather && weather.current_weather && (
         <div style={{ marginBottom: "1rem" }}>
-          <strong>Current Temperature:</strong>{" "}
-          {weather.current_weather.temperature}&#8451;<br />
+          <strong>Current Temperature:</strong> {weather.current_weather.temperature}&#8451;<br />
           <strong>Wind Speed:</strong> {weather.current_weather.windspeed} m/s<br />
-          <strong>Weather Code:</strong>{" "}
-          {weather.current_weather.weathercode}
+          <strong>Weather Code:</strong> {weather.current_weather.weathercode}
         </div>
       )}
 
+      {/* Hourly chart */}
       {weather && (
         <div>
           <h2>Hourly Temperature Chart</h2>
